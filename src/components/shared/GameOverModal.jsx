@@ -1,32 +1,50 @@
 import React from "react";
-import { Heart, Trophy, Sparkles, RotateCcw, Home } from "lucide-react";
+import { Heart, Trophy, Sparkles, RotateCcw, AlertTriangle, Skull } from "lucide-react";
 import styles from "./GameOverModal.module.css";
 
 export default function GameOverModal({
   isOpen,
   score,
   earnedCoins,
+  reason = "Mistake occurred during gameplay!",
+  isMistake = true,
   canRevive = true,
   reviveCount = 0,
-  maxRevives = 2,
+  maxRevives = 1,
   onRevive,
-  onNoThanks
+  onNoThanks,
+  onPlayAgain
 }) {
   if (!isOpen) return null;
 
   return (
     <div className={styles.backdrop}>
       <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
-        {/* Crown / Trophy Banner */}
-        <div className={styles.iconCircle}>
-          <Trophy size={36} className={styles.trophyIcon} />
+        {/* Header Icon Circle: Red for Mistake / Gold for Normal */}
+        <div className={isMistake ? styles.iconCircleMistake : styles.iconCircle}>
+          {isMistake ? (
+            <AlertTriangle size={36} className={styles.mistakeIcon} />
+          ) : (
+            <Trophy size={36} className={styles.trophyIcon} />
+          )}
         </div>
 
         <h2 id="gameOverTitle" className={styles.title}>
           GAME OVER
         </h2>
 
-        {/* Score Summary */}
+        {/* Mistake banner and explanation */}
+        {reason && (
+          <div className={styles.mistakeCard}>
+            <div className={styles.mistakeBadge}>
+              <Skull size={14} />
+              <span>{isMistake ? "MISTAKE OCCURRED" : "RUN CONCLUDED"}</span>
+            </div>
+            <p className={styles.reasonText}>{reason}</p>
+          </div>
+        )}
+
+        {/* Score & Coins Summary */}
         <div className={styles.scoreBoard}>
           <div className={styles.scoreItem}>
             <span className={styles.scoreLabel}>Final Score</span>
@@ -44,11 +62,11 @@ export default function GameOverModal({
           </div>
         </div>
 
-        {/* Revive Prompt */}
+        {/* Revive Section */}
         {canRevive && reviveCount < maxRevives ? (
           <div className={styles.reviveSection}>
             <p className={styles.promptText}>
-              Keep your streak alive? Revive now with an extra life!
+              Keep your streak alive? Revive now to fix the mistake!
             </p>
             <span className={styles.reviveRemaining}>
               ({maxRevives - reviveCount} revive remaining this run)
@@ -60,17 +78,27 @@ export default function GameOverModal({
             </button>
           </div>
         ) : (
-          <p className={styles.promptText}>
-            No more revives available for this run. Well played!
+          <p className={styles.promptTextMuted}>
+            No revives remaining for this run.
           </p>
         )}
 
-        {/* No Thanks / Cash-in button (Section 55.25) */}
-        <button className={styles.noThanksBtn} onClick={onNoThanks}>
-          <Sparkles size={16} />
-          <span>Collect +{earnedCoins} Coins & Return Home</span>
-        </button>
+        {/* Action Buttons: Try Again & Return Home */}
+        <div className={styles.actionsGroup}>
+          {onPlayAgain && (
+            <button className={styles.playAgainBtn} onClick={onPlayAgain}>
+              <RotateCcw size={16} />
+              <span>Try Again</span>
+            </button>
+          )}
+
+          <button className={styles.noThanksBtn} onClick={onNoThanks}>
+            <Sparkles size={16} />
+            <span>Collect +{earnedCoins} Coins & Return Home</span>
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Heart, Volume2, VolumeX, Timer, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, Timer, Volume2, VolumeX, Sparkles, Trophy, AlertTriangle } from "lucide-react";
 import GameOverModal from "../../components/shared/GameOverModal";
 import styles from "./SliceStorm.module.css";
 
@@ -55,14 +55,14 @@ class SliceAudio {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.4);
-      gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+      osc.frequency.setValueAtTime(160, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.45);
+      gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.45);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.42);
+      osc.stop(this.ctx.currentTime + 0.47);
     } catch (e) {}
   }
   playCombo() {
@@ -79,6 +79,41 @@ class SliceAudio {
         gain.connect(this.ctx.destination);
         osc.start(this.ctx.currentTime + i * 0.06);
         osc.stop(this.ctx.currentTime + i * 0.06 + 0.16);
+      });
+    } catch (e) {}
+  }
+  playMiss() {
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(90, this.ctx.currentTime + 0.14);
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.14);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.15);
+    } catch (e) {}
+  }
+  playDefeat() {
+    this.init();
+    if (!this.ctx) return;
+    try {
+      [240, 200, 160, 120].forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.1 + 0.16);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + i * 0.1);
+        osc.stop(this.ctx.currentTime + i * 0.1 + 0.18);
       });
     } catch (e) {}
   }
@@ -99,11 +134,21 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
 
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
-  const [lives, setLives] = useState(3);
+  const [strikes, setStrikes] = useState(0); // 3 strikes = game over
   const [reviveCount, setReviveCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameOverReason, setGameOverReason] = useState("");
+  const [isMistakeOver, setIsMistakeOver] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [comboBanner, setComboBanner] = useState(null);
+  const [mistakeBanner, setMistakeBanner] = useState(null);
+  const [isShaking, setIsShaking] = useState(false);
+
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
+
+  const strikesRef = useRef(0);
+  strikesRef.current = strikes;
 
   // Active game animation refs
   const stateRef = useRef({
@@ -111,7 +156,8 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     halves: [],
     particles: [],
     splatters: [],
-    bladePoints: [], // [{x, y, time}]
+    strikeCrosses: [], // [{x, y, opacity}]
+    bladePoints: [],
     isMouseDown: false,
     lastSpawnTime: 0,
     currentCombo: 0,
@@ -134,6 +180,8 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
       setTimeLeft((t) => {
         if (t <= 1) {
           stateRef.current.running = false;
+          setIsMistakeOver(false);
+          setGameOverReason("Time Expired! The 30-second storm concluded.");
           setIsGameOver(true);
           return 0;
         }
@@ -155,10 +203,11 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     let lastTime = performance.now();
 
     const spawnFruitOrBomb = () => {
-      const isBomb = Math.random() < 0.2;
+      if (!stateRef.current.running) return;
+      const isBomb = Math.random() < 0.22;
       const x = Math.random() * (canvas.width - 120) + 60;
       const vx = (Math.random() - 0.5) * 120;
-      const vy = -(Math.random() * 200 + 450); // Shoot upward
+      const vy = -(Math.random() * 200 + 460); // Shoot upward
 
       if (isBomb) {
         stateRef.current.fruits.push({
@@ -194,7 +243,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
       lastTime = timestamp;
 
       // Fruit Spawning Logic
-      if (timestamp - stateRef.current.lastSpawnTime > 1100) {
+      if (timestamp - stateRef.current.lastSpawnTime > 1100 && stateRef.current.running) {
         stateRef.current.lastSpawnTime = timestamp;
         const count = Math.random() > 0.5 ? 2 : 1;
         for (let i = 0; i < count; i++) {
@@ -210,10 +259,46 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
         f.rotation += f.rotSpeed * dt;
       });
 
-      // Filter out fruits that fell below canvas
-      stateRef.current.fruits = stateRef.current.fruits.filter(
-        (f) => f.y < canvas.height + 60
-      );
+      // Check for fruits that dropped below the screen (MISTAKE: MISSED FRUIT!)
+      const remainingFruits = [];
+      for (const f of stateRef.current.fruits) {
+        if (f.y >= canvas.height + 40) {
+          // If a whole unsliced fruit fell off, that's a mistake!
+          if (!f.isBomb && stateRef.current.running) {
+            if (soundEnabledRef.current) sliceAudio.playMiss();
+
+            // Spawn red 'X' strike particle
+            stateRef.current.strikeCrosses.push({
+              x: Math.max(30, Math.min(canvas.width - 30, f.x)),
+              y: canvas.height - 25,
+              opacity: 1.0
+            });
+
+            // Increment strikes
+            const nextStrikes = strikesRef.current + 1;
+            strikesRef.current = nextStrikes;
+            setStrikes(nextStrikes);
+
+            if (nextStrikes >= 3) {
+              // 3 STRIKES: MISTAKE GAME OVER!
+              if (soundEnabledRef.current) sliceAudio.playDefeat();
+              setIsShaking(true);
+              setTimeout(() => setIsShaking(false), 450);
+              setMistakeBanner("3 FRUITS MISSED! MISTAKE!");
+              setGameOverReason("3 Fruits Missed! You let fruits drop without slicing.");
+              setIsMistakeOver(true);
+              stateRef.current.running = false;
+              setTimeout(() => {
+                setIsGameOver(true);
+                setMistakeBanner(null);
+              }, 500);
+            }
+          }
+        } else {
+          remainingFruits.push(f);
+        }
+      }
+      stateRef.current.fruits = remainingFruits;
 
       // Update Halves
       stateRef.current.halves.forEach((h) => {
@@ -234,6 +319,12 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
         p.life -= dt;
       });
       stateRef.current.particles = stateRef.current.particles.filter((p) => p.life > 0);
+
+      // Update Strike Crosses
+      stateRef.current.strikeCrosses.forEach((sc) => {
+        sc.opacity -= 0.8 * dt;
+      });
+      stateRef.current.strikeCrosses = stateRef.current.strikeCrosses.filter((sc) => sc.opacity > 0);
 
       // Prune old blade trail points
       const now = performance.now();
@@ -268,7 +359,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
           ctx.arc(0, 0, f.radius, 0, Math.PI * 2);
           ctx.fillStyle = "#1e293b";
           ctx.fill();
-          ctx.strokeStyle = "#475569";
+          ctx.strokeStyle = "#ef4444";
           ctx.lineWidth = 2;
           ctx.stroke();
 
@@ -287,7 +378,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
           ctx.arc(10, -f.radius - 14, 4, 0, Math.PI * 2);
           ctx.fill();
         } else {
-          // Rind / Skin
+          // Fruit Rind
           ctx.beginPath();
           ctx.arc(0, 0, f.radius, 0, Math.PI * 2);
           ctx.fillStyle = f.type.color;
@@ -299,7 +390,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
           ctx.fillStyle = f.type.innerColor;
           ctx.fill();
 
-          // Fruit seeds or texture
+          // Fruit seeds
           ctx.fillStyle = "#0f172a";
           [-5, 0, 5].forEach((offset) => {
             ctx.beginPath();
@@ -334,6 +425,23 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
         ctx.fillStyle = h.type.innerColor;
         ctx.fill();
 
+        ctx.restore();
+      });
+
+      // Draw Miss Strike Crosses (Red 'X' where fruit fell)
+      stateRef.current.strikeCrosses.forEach((sc) => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sc.opacity);
+        ctx.strokeStyle = "#ef4444";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        const sz = 14;
+        ctx.beginPath();
+        ctx.moveTo(sc.x - sz, sc.y - sz);
+        ctx.lineTo(sc.x + sz, sc.y + sz);
+        ctx.moveTo(sc.x + sz, sc.y - sz);
+        ctx.lineTo(sc.x - sz, sc.y + sz);
+        ctx.stroke();
         ctx.restore();
       });
 
@@ -389,15 +497,16 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
       cancelAnimationFrame(animId);
       stateRef.current.running = false;
     };
-  }, [soundEnabled]);
+  }, []);
 
   // Blade Slicing Collision Detection
   const checkBladeSlice = (x1, y1, x2, y2) => {
+    if (!stateRef.current.running) return;
+
     let slicedInSlash = 0;
     const remaining = [];
 
     stateRef.current.fruits.forEach((fruit) => {
-      // Distance from point (fruit.x, fruit.y) to segment (x1, y1) -> (x2, y2)
       const dx = x2 - x1;
       const dy = y2 - y1;
       const len = Math.sqrt(dx * dx + dy * dy);
@@ -414,33 +523,41 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
       if (dist <= fruit.radius) {
         // HIT!
         if (fruit.isBomb) {
-          // BOMB DETONATION!
-          if (soundEnabled) sliceAudio.playBomb();
+          // MISTAKE OCCURRED: BOMB DETONATION!
+          if (soundEnabledRef.current) {
+            sliceAudio.playBomb();
+            sliceAudio.playDefeat();
+          }
 
-          // Red explosion sparks
-          for (let i = 0; i < 35; i++) {
+          // Red & orange explosion sparks
+          for (let i = 0; i < 40; i++) {
             stateRef.current.particles.push({
               x: fruit.x,
               y: fruit.y,
               vx: (Math.random() - 0.5) * 450,
               vy: (Math.random() - 0.5) * 450,
               color: Math.random() > 0.5 ? "#ef4444" : "#f59e0b",
-              life: 0.6
+              life: 0.65
             });
           }
 
-          setLives((l) => {
-            const nextL = l - 1;
-            if (nextL <= 0) {
-              stateRef.current.running = false;
-              setIsGameOver(true);
-            }
-            return nextL;
-          });
+          // Screen shake & Mistake banner
+          setIsShaking(true);
+          setTimeout(() => setIsShaking(false), 450);
+          setMistakeBanner("BOMB HIT! MISTAKE!");
+          setGameOverReason("Bomb Detonated! You sliced a dangerous explosive bomb.");
+          setIsMistakeOver(true);
+
+          // Stop running and show Game Over immediately
+          stateRef.current.running = false;
+          setTimeout(() => {
+            setIsGameOver(true);
+            setMistakeBanner(null);
+          }, 500);
         } else {
           // Sliced fruit!
           slicedInSlash++;
-          if (soundEnabled) sliceAudio.playSquish();
+          if (soundEnabledRef.current) sliceAudio.playSquish();
 
           // Spawn sliced halves
           stateRef.current.halves.push(
@@ -507,10 +624,9 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
 
       stateRef.current.comboTimer = setTimeout(() => {
         if (stateRef.current.currentCombo >= 3) {
-          // Trigger combo reward!
           const comboPts = stateRef.current.currentCombo * 10;
           setScore((s) => s + comboPts);
-          if (soundEnabled) sliceAudio.playCombo();
+          if (soundEnabledRef.current) sliceAudio.playCombo();
           setComboBanner(`${stateRef.current.currentCombo}x COMBO! +${comboPts}`);
           setTimeout(() => setComboBanner(null), 1400);
         }
@@ -529,7 +645,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
 
     stateRef.current.bladePoints = [{ x, y, time: performance.now() }];
-    if (soundEnabled) sliceAudio.playSwoosh();
+    if (soundEnabledRef.current) sliceAudio.playSwoosh();
   };
 
   const handlePointerMove = (e) => {
@@ -557,24 +673,45 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     stateRef.current.isMouseDown = false;
   };
 
-  // Revive logic (Section 55.24)
+  // Revive logic: grants 1 extra attempt to fix mistake
   const handleRevive = () => {
-    setLives(2);
-    setTimeLeft((t) => Math.max(t, 15)); // Restore timer to at least 15s
+    setStrikes(0);
+    strikesRef.current = 0;
+    setTimeLeft((t) => Math.max(t, 15));
     setReviveCount((c) => c + 1);
     setIsGameOver(false);
+    setMistakeBanner(null);
+
+    // Clear on-screen bombs to protect player
+    stateRef.current.fruits = stateRef.current.fruits.filter((f) => !f.isBomb);
     stateRef.current.running = true;
   };
 
-  // No thanks cash-in (Section 55.25)
+  // Play Again: restart completely from 0
+  const handlePlayAgain = () => {
+    setScore(0);
+    setTimeLeft(30);
+    setStrikes(0);
+    strikesRef.current = 0;
+    setReviveCount(0);
+    setIsGameOver(false);
+    setMistakeBanner(null);
+    stateRef.current.fruits = [];
+    stateRef.current.halves = [];
+    stateRef.current.particles = [];
+    stateRef.current.strikeCrosses = [];
+    stateRef.current.running = true;
+  };
+
+  // Cash-in & Return Home
   const handleNoThanks = () => {
     const earned = calculateEarnedCoins(score);
     onFinishGame(earned, score);
   };
 
   return (
-    <div className={styles.gameContainer}>
-      {/* Light Theme Game HUD (Section 55.6) */}
+    <div className={`${styles.gameContainer} ${isShaking ? styles.shake : ""}`}>
+      {/* Light Theme Game HUD */}
       <header className={styles.hud}>
         <button className={styles.backBtn} onClick={onBack} aria-label="Exit Game">
           <ArrowLeft size={18} />
@@ -592,14 +729,17 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
             <span className={styles.statValue}>{score}</span>
           </div>
 
-          <div className={styles.livesPill}>
+          {/* Strikes / Misses Indicator (3 Strikes = Game Over) */}
+          <div className={styles.strikesPill} title="Strikes (Missed Fruits). 3 strikes = Game Over!">
             {[...Array(3)].map((_, i) => (
-              <Heart
+              <span
                 key={i}
-                size={18}
-                className={i < lives ? styles.heartActive : styles.heartLost}
-                fill={i < lives ? "#ef4444" : "none"}
-              />
+                className={`${styles.strikeMark} ${
+                  i < strikes ? styles.strikeActive : styles.strikeInactive
+                }`}
+              >
+                ✕
+              </span>
             ))}
           </div>
 
@@ -636,21 +776,32 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
           </div>
         )}
 
+        {/* Floating Mistake Banner */}
+        {mistakeBanner && (
+          <div className={styles.mistakeBanner}>
+            <AlertTriangle size={18} />
+            <span>{mistakeBanner}</span>
+          </div>
+        )}
+
         <div className={styles.swipePrompt}>
-          SWIPE OR DRAG TO SLICE FLYING FRUIT • DODGE BOMBS!
+          SWIPE TO SLICE FRUITS • DODGE BOMBS • DON'T DROP 3 FRUITS!
         </div>
       </div>
 
-      {/* Game Over & Working Revive Modal */}
+      {/* Game Over Modal with Mistake Reason */}
       <GameOverModal
         isOpen={isGameOver}
         score={score}
         earnedCoins={calculateEarnedCoins(score)}
+        reason={gameOverReason}
+        isMistake={isMistakeOver}
         canRevive={reviveCount < 1}
         reviveCount={reviveCount}
         maxRevives={1}
         onRevive={handleRevive}
         onNoThanks={handleNoThanks}
+        onPlayAgain={handlePlayAgain}
       />
     </div>
   );

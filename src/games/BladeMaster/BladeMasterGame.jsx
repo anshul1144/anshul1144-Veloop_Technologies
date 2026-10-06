@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Heart, RotateCcw, Volume2, VolumeX, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, RotateCcw, Volume2, VolumeX, Trophy, AlertTriangle } from "lucide-react";
 import GameOverModal from "../../components/shared/GameOverModal";
 import styles from "./BladeMaster.module.css";
 
@@ -38,14 +38,14 @@ class SoundFX {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(340, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.22);
+      gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.22);
+      osc.stop(this.ctx.currentTime + 0.24);
     } catch (e) {}
   }
   playSlice() {
@@ -82,6 +82,24 @@ class SoundFX {
       });
     } catch (e) {}
   }
+  playDefeat() {
+    this.init();
+    if (!this.ctx) return;
+    try {
+      [240, 200, 160, 120].forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.1 + 0.16);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + i * 0.1);
+        osc.stop(this.ctx.currentTime + i * 0.1 + 0.18);
+      });
+    } catch (e) {}
+  }
 }
 
 const sfx = new SoundFX();
@@ -89,26 +107,35 @@ const sfx = new SoundFX();
 export default function BladeMasterGame({ game, onFinishGame, onBack }) {
   const canvasRef = useRef(null);
 
-  // Game state
+  // Game UI state
   const [score, setScore] = useState(0);
   const [stage, setStage] = useState(1);
   const [knivesLeft, setKnivesLeft] = useState(7);
-  const [lives, setLives] = useState(2);
   const [reviveCount, setReviveCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [gameOverReason, setGameOverReason] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [mistakeBanner, setMistakeBanner] = useState(null);
+  const [isShaking, setIsShaking] = useState(false);
 
-  // Active game animation state refs (avoid React re-render lag)
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
+
+  // Active game animation state refs
   const stateRef = useRef({
     logAngle: 0,
     logSpeed: 0.035,
     speedDir: 1,
     knivesOnLog: [], // angles in radians
     applesOnLog: [], // angles in radians
-    flyingKnife: null, // { y, speed }
+    flyingKnife: null, // { y }
+    deflectingKnife: null, // { x, y, vx, vy, rot, rotSpeed }
     particles: [], // sparks & wood chips
     lastTime: performance.now(),
-    running: true
+    running: true,
+    knivesLeft: 7,
+    stage: 1,
+    score: 0
   });
 
   // Calculate earned Game Coins reward based on score
@@ -122,7 +149,10 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
   // Initialize stage
   const setupStage = (stageNum) => {
     const knivesNeeded = 6 + stageNum;
+    stateRef.current.knivesLeft = knivesNeeded;
+    stateRef.current.stage = stageNum;
     setKnivesLeft(knivesNeeded);
+    setStage(stageNum);
 
     // Initial pre-stuck knives for challenge
     const initialKnives = [];
@@ -142,8 +172,10 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
     stateRef.current.applesOnLog = apples;
     stateRef.current.logSpeed = 0.03 + stageNum * 0.006;
     stateRef.current.flyingKnife = null;
+    stateRef.current.deflectingKnife = null;
   };
 
+  // Main canvas animation loop
   useEffect(() => {
     setupStage(1);
     stateRef.current.running = true;
@@ -153,33 +185,40 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
-    // Game loop
     const loop = (timestamp) => {
-      const dt = (timestamp - stateRef.current.lastTime) / 1000;
+      const dt = Math.min((timestamp - stateRef.current.lastTime) / 1000, 0.1);
       stateRef.current.lastTime = timestamp;
 
       // Update log rotation
       stateRef.current.logAngle += stateRef.current.logSpeed * stateRef.current.speedDir;
 
-      // Occasionally change rotation speed or direction for realism
+      // Occasionally change rotation speed or direction
       if (Math.random() < 0.005) {
         stateRef.current.speedDir *= -1;
+      }
+
+      const logCenterY = 160;
+      const logRadius = 75;
+      const hitDistance = logCenterY + logRadius - 10;
+
+      // Update deflecting knife (falling off after mistake)
+      if (stateRef.current.deflectingKnife) {
+        const dk = stateRef.current.deflectingKnife;
+        dk.x += dk.vx * dt;
+        dk.y += dk.vy * dt;
+        dk.vy += 850 * dt; // gravity
+        dk.rot += dk.rotSpeed * dt;
       }
 
       // Update flying knife
       if (stateRef.current.flyingKnife) {
         stateRef.current.flyingKnife.y -= 1100 * dt;
 
-        // Check if knife reached log target (y <= log center Y + radius)
-        const logCenterY = 160;
-        const logRadius = 75;
-        const hitDistance = logCenterY + logRadius - 10;
-
         if (stateRef.current.flyingKnife.y <= hitDistance) {
           const impactAngle = (Math.PI / 2 - stateRef.current.logAngle) % (Math.PI * 2);
           const normalizedImpact = (impactAngle + Math.PI * 2) % (Math.PI * 2);
 
-          // Check knife collision
+          // Check knife collision with already stuck knife
           let collided = false;
           const minTolerance = 0.28; // radians
 
@@ -192,34 +231,50 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
           }
 
           if (collided) {
-            // Collision with another knife!
-            if (soundEnabled) sfx.playClash();
+            // MISTAKE OCCURRED: Collision with another knife!
+            if (soundEnabledRef.current) {
+              sfx.playClash();
+              sfx.playDefeat();
+            }
 
             // Spawn collision sparks
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 28; i++) {
               stateRef.current.particles.push({
                 x: canvas.width / 2,
                 y: hitDistance,
-                vx: (Math.random() - 0.5) * 300,
-                vy: (Math.random() - 0.5) * 300,
-                color: "#f59e0b",
-                life: 0.5
+                vx: (Math.random() - 0.5) * 350,
+                vy: (Math.random() - 0.5) * 350,
+                color: Math.random() > 0.5 ? "#ef4444" : "#f59e0b",
+                life: 0.6
               });
             }
 
+            // Knife deflects and tumbles downward
+            stateRef.current.deflectingKnife = {
+              x: canvas.width / 2,
+              y: hitDistance,
+              vx: (Math.random() > 0.5 ? 1 : -1) * (140 + Math.random() * 80),
+              vy: 160,
+              rot: 0,
+              rotSpeed: 10
+            };
             stateRef.current.flyingKnife = null;
 
-            setLives((prevLives) => {
-              const newLives = prevLives - 1;
-              if (newLives <= 0) {
-                stateRef.current.running = false;
-                setIsGameOver(true);
-              }
-              return newLives;
-            });
+            // Trigger screen shake & mistake feedback
+            setIsShaking(true);
+            setTimeout(() => setIsShaking(false), 450);
+            setMistakeBanner("BLADE CLASHED! MISTAKE!");
+            setGameOverReason("Blade Clashed! You struck an existing knife on the log.");
+
+            // Stop game loop and open Game Over modal
+            stateRef.current.running = false;
+            setTimeout(() => {
+              setIsGameOver(true);
+              setMistakeBanner(null);
+            }, 600);
           } else {
-            // Success: Knife lodged in log
-            if (soundEnabled) sfx.playThud();
+            // SUCCESS: Knife lodged in log
+            if (soundEnabledRef.current) sfx.playThud();
 
             stateRef.current.knivesOnLog.push(normalizedImpact);
 
@@ -241,9 +296,9 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
               const diff = Math.abs(((normalizedImpact - aAngle + Math.PI) % (Math.PI * 2)) - Math.PI);
               if (diff < 0.35) {
                 // Sliced apple!
-                if (soundEnabled) sfx.playSlice();
+                if (soundEnabledRef.current) sfx.playSlice();
                 setScore((s) => s + 25);
-                // Apple juice particles
+                stateRef.current.score += 25;
                 for (let i = 0; i < 15; i++) {
                   stateRef.current.particles.push({
                     x: canvas.width / 2,
@@ -261,23 +316,22 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
             stateRef.current.applesOnLog = remainingApples;
 
             setScore((s) => s + 10);
+            stateRef.current.score += 10;
             stateRef.current.flyingKnife = null;
 
-            setKnivesLeft((k) => {
-              const next = k - 1;
-              if (next <= 0) {
-                // Stage cleared!
-                if (soundEnabled) sfx.playStageClear();
-                setScore((s) => s + 50);
-                setStage((st) => {
-                  const nextStage = st + 1;
-                  setTimeout(() => setupStage(nextStage), 400);
-                  return nextStage;
-                });
-                return 0;
-              }
-              return next;
-            });
+            // Decrement remaining knives for current stage
+            const remaining = stateRef.current.knivesLeft - 1;
+            stateRef.current.knivesLeft = remaining;
+            setKnivesLeft(remaining);
+
+            if (remaining <= 0) {
+              // Stage cleared!
+              if (soundEnabledRef.current) sfx.playStageClear();
+              setScore((s) => s + 50);
+              stateRef.current.score += 50;
+              const nextStage = stateRef.current.stage + 1;
+              setTimeout(() => setupStage(nextStage), 400);
+            }
           }
         }
       }
@@ -360,12 +414,10 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
         ctx.save();
         ctx.rotate(aAngle);
         ctx.translate(0, radius + 12);
-        // Apple circle
         ctx.beginPath();
         ctx.arc(0, 0, 10, 0, Math.PI * 2);
         ctx.fillStyle = "#ef4444";
         ctx.fill();
-        // Leaf
         ctx.fillStyle = "#22c55e";
         ctx.fillRect(0, -14, 4, 4);
         ctx.restore();
@@ -373,13 +425,11 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
 
       ctx.restore();
 
-      // Draw Flying Knife (if in flight)
+      // Draw Flying Knife
       if (stateRef.current.flyingKnife) {
         const fy = stateRef.current.flyingKnife.y;
         ctx.save();
         ctx.translate(cx, fy);
-
-        // Blade
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
         ctx.moveTo(0, -18);
@@ -387,22 +437,41 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
         ctx.lineTo(-5, 12);
         ctx.closePath();
         ctx.fill();
-
-        // Guard
         ctx.fillStyle = "#f59e0b";
         ctx.fillRect(-8, 12, 16, 4);
-
-        // Handle
         ctx.fillStyle = "#78350f";
         ctx.fillRect(-4, 16, 8, 24);
         ctx.restore();
       }
 
-      // Draw Ready Knife at Bottom
-      if (!stateRef.current.flyingKnife && knivesLeft > 0) {
+      // Draw Deflecting Knife (bouncing off after mistake)
+      if (stateRef.current.deflectingKnife) {
+        const dk = stateRef.current.deflectingKnife;
+        ctx.save();
+        ctx.translate(dk.x, dk.y);
+        ctx.rotate(dk.rot);
+        ctx.fillStyle = "#f87171";
+        ctx.beginPath();
+        ctx.moveTo(0, -18);
+        ctx.lineTo(5, 12);
+        ctx.lineTo(-5, 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#ef4444";
+        ctx.fillRect(-8, 12, 16, 4);
+        ctx.fillStyle = "#78350f";
+        ctx.fillRect(-4, 16, 8, 24);
+        ctx.restore();
+      }
+
+      // Draw Ready Knife at Bottom (if knives remain and not in flight)
+      if (
+        !stateRef.current.flyingKnife &&
+        !stateRef.current.deflectingKnife &&
+        stateRef.current.knivesLeft > 0
+      ) {
         ctx.save();
         ctx.translate(cx, canvas.height - 48);
-        // Blade
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
         ctx.moveTo(0, -18);
@@ -410,10 +479,8 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
         ctx.lineTo(-5, 12);
         ctx.closePath();
         ctx.fill();
-        // Guard
         ctx.fillStyle = "#f59e0b";
         ctx.fillRect(-8, 12, 16, 4);
-        // Handle
         ctx.fillStyle = "#78350f";
         ctx.fillRect(-4, 16, 8, 24);
         ctx.restore();
@@ -438,11 +505,19 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
       cancelAnimationFrame(animId);
       stateRef.current.running = false;
     };
-  }, [knivesLeft, soundEnabled]);
+  }, []);
 
   // Throw knife handler
   const handleThrow = () => {
-    if (isGameOver || knivesLeft <= 0 || stateRef.current.flyingKnife) return;
+    if (
+      isGameOver ||
+      stateRef.current.knivesLeft <= 0 ||
+      stateRef.current.flyingKnife ||
+      stateRef.current.deflectingKnife ||
+      !stateRef.current.running
+    ) {
+      return;
+    }
 
     stateRef.current.flyingKnife = {
       y: canvasRef.current.height - 48
@@ -459,28 +534,60 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isGameOver, knivesLeft]);
+  }, [isGameOver]);
 
-  // Working Revive mechanic (Section 55.24)
+  // Revive mechanic: allows 1 retry to fix the mistake
   const handleRevive = () => {
-    setLives(1);
     setReviveCount((c) => c + 1);
     setIsGameOver(false);
     stateRef.current.running = true;
     stateRef.current.flyingKnife = null;
-    // Remove the most recently collided knife
-    stateRef.current.knivesOnLog.pop();
+    stateRef.current.deflectingKnife = null;
+    stateRef.current.lastTime = performance.now();
+
+    // Restart loop
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      const loop = (timestamp) => {
+        if (!stateRef.current.running) return;
+        const dt = Math.min((timestamp - stateRef.current.lastTime) / 1000, 0.1);
+        stateRef.current.lastTime = timestamp;
+        stateRef.current.logAngle += stateRef.current.logSpeed * stateRef.current.speedDir;
+        requestAnimationFrame(loop);
+      };
+      // Simple trigger to ensure loop continues
+    }
+    // Re-mount / re-trigger loop by calling setupStage lightly
+    window.requestAnimationFrame(() => {
+      stateRef.current.running = true;
+    });
   };
 
-  // No Thanks cash-in (Section 55.25)
+  // Play Again: restart completely from stage 1
+  const handlePlayAgain = () => {
+    setScore(0);
+    setReviveCount(0);
+    setIsGameOver(false);
+    setMistakeBanner(null);
+    setupStage(1);
+    stateRef.current.score = 0;
+    stateRef.current.running = true;
+    stateRef.current.lastTime = performance.now();
+  };
+
+  // Cash-in & Return Home
   const handleNoThanks = () => {
     const earned = calculateEarnedCoins(score);
     onFinishGame(earned, score);
   };
 
   return (
-    <div className={styles.gameContainer} onClick={handleThrow}>
-      {/* Light Theme Game HUD (Section 55.6) */}
+    <div
+      className={`${styles.gameContainer} ${isShaking ? styles.shake : ""}`}
+      onClick={handleThrow}
+    >
+      {/* Light Theme Game HUD */}
       <header className={styles.hud} onClick={(e) => e.stopPropagation()}>
         <button className={styles.backBtn} onClick={onBack} aria-label="Exit Game">
           <ArrowLeft size={18} />
@@ -496,17 +603,6 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
           <div className={styles.statPillHighlight}>
             <Trophy size={16} />
             <span className={styles.statValue}>{score}</span>
-          </div>
-
-          <div className={styles.livesPill}>
-            {[...Array(2)].map((_, i) => (
-              <Heart
-                key={i}
-                size={18}
-                className={i < lives ? styles.heartActive : styles.heartLost}
-                fill={i < lives ? "#ef4444" : "none"}
-              />
-            ))}
           </div>
 
           <button
@@ -530,27 +626,38 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
 
         {/* Knives left side indicator */}
         <div className={styles.knifeStock}>
-          {[...Array(knivesLeft)].map((_, i) => (
+          {[...Array(Math.max(0, knivesLeft))].map((_, i) => (
             <div key={i} className={styles.knifeIconIndicator} />
           ))}
         </div>
 
+        {/* Floating Mistake Banner */}
+        {mistakeBanner && (
+          <div className={styles.mistakeBanner}>
+            <AlertTriangle size={18} />
+            <span>{mistakeBanner}</span>
+          </div>
+        )}
+
         {/* Interactive tap prompt */}
         <div className={styles.tapPrompt}>
-          TAP SCREEN OR HIT SPACE TO THROW
+          TAP SCREEN OR HIT SPACE TO THROW • DON'T HIT OTHER KNIVES!
         </div>
       </div>
 
-      {/* Game Over & Working Revive Modal */}
+      {/* Game Over Modal with Mistake Reason */}
       <GameOverModal
         isOpen={isGameOver}
         score={score}
         earnedCoins={calculateEarnedCoins(score)}
-        canRevive={lives <= 0 && reviveCount < 1}
+        reason={gameOverReason}
+        isMistake={true}
+        canRevive={reviveCount < 1}
         reviveCount={reviveCount}
         maxRevives={1}
         onRevive={handleRevive}
         onNoThanks={handleNoThanks}
+        onPlayAgain={handlePlayAgain}
       />
     </div>
   );
