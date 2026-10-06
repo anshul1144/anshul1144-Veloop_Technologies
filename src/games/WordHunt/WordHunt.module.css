@@ -1,0 +1,233 @@
+.gameContainer {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 50%, #bfdbfe 100%);
+  color: #1e3a8a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
+
+.hud {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .hud {
+    padding: 10px 14px;
+  }
+}
+
+.backBtn {
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  padding: 8px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: #eff6ff;
+  transform: translateX(-2px);
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statPill {
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.statValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.statPillHighlight {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.statPillHighlight .statValue {
+  color: #ffffff;
+}
+
+.soundBtn {
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.gameArea {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 10px 16px;
+  box-sizing: border-box;
+}
+
+.wordDisplay {
+  background: #ffffff;
+  border: 2px solid #93c5fd;
+  border-radius: 16px;
+  padding: 10px 24px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #1d4ed8;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+}
+
+.letterGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 16px;
+}
+
+.tile {
+  aspect-ratio: 1;
+  background: #ffffff;
+  border: 2px solid #93c5fd;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 900;
+  color: #1e3a8a;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+}
+
+.tile:active {
+  transform: translateY(0);
+}
+
+.tileSelected {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.5) !important;
+  transform: scale(0.95);
+}
+
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.submitBtn {
+  flex: 2;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  padding: 12px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.clearBtn {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  color: #64748b;
+  padding: 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.targetsBox {
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  text-align: center;
+  max-width: 340px;
+}

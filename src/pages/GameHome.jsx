@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Play, BookOpen, Sparkles, Trophy, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Play, BookOpen, Sparkles, Trophy, CheckCircle2 } from "lucide-react";
 import { games } from "../data/gamesData";
 import { useGameCoins } from "../context/GameCoinContext";
 import BottomNav from "../components/layout/BottomNav";
 import TokenModal from "../components/shared/TokenModal";
 import GameGuideModal from "../components/shared/GameGuideModal";
+
+// Import all 13 arcade playable games
 import BladeMasterGame from "../games/BladeMaster/BladeMasterGame";
+import NutcraftGame from "../games/Nutcraft/NutcraftGame";
+import BowlexaGame from "../games/Bowlexa/BowlexaGame";
+import BlockCrushGame from "../games/BlockCrush/BlockCrushGame";
 import SliceStormGame from "../games/SliceStorm/SliceStormGame";
+import CosmoWarriorGame from "../games/CosmoWarrior/CosmoWarriorGame";
+import ToiletTacticsGame from "../games/ToiletTactics/ToiletTacticsGame";
+import WordHuntGame from "../games/WordHunt/WordHuntGame";
+import BubbleBlastGame from "../games/BubbleBlast/BubbleBlastGame";
+import MergeMasterGame from "../games/MergeMaster/MergeMasterGame";
+import WormzyGame from "../games/Wormzy/WormzyGame";
+import AquaFillGame from "../games/AquaFill/AquaFillGame";
+import RealmClashGame from "../games/RealmClash/RealmClashGame";
+
 import styles from "./GameHome.module.css";
 
 export default function GameHome() {
@@ -30,7 +44,7 @@ export default function GameHome() {
   const [showTokenError, setShowTokenError] = useState(false);
   const [recentReward, setRecentReward] = useState(null);
 
-  // Play Now Click Handler (Section 55.13 & 55.14)
+  // Play Now Click Handler
   const handlePlayNowClick = () => {
     // 1. Check if user has sufficient tokens
     if (tokens < game.cost) {
@@ -38,22 +52,14 @@ export default function GameHome() {
       return;
     }
 
-    // 2. If game is not one of the 2 fully developed games, inform user
-    if (!game.playable) {
-      alert(
-        `"${game.name}" is one of the 11 banner showcase games. Please play "Blade Master!" or "Slice Storm!" for the 2 fully playable game experiences mandated by the specification!`
-      );
-      return;
-    }
-
-    // 3. Deduct 20 tokens
+    // 2. Deduct 20 tokens
     const success = deductTokens(game.cost);
     if (!success) {
       setShowTokenError(true);
       return;
     }
 
-    // 4. First-time guide check (Section 55.15 & 55.16)
+    // 3. First-time guide check
     if (!hasSeenGuide(game.id)) {
       setScreenMode("guide");
     } else {
@@ -67,9 +73,9 @@ export default function GameHome() {
     setScreenMode("playing");
   };
 
-  // Called when player finishes run and clicks "No Thanks" (Section 55.25)
+  // Called when player finishes run and returns
   const handleFinishGame = (earnedCoins, finalScore, earnedTokens = 0) => {
-    addCoins(earnedCoins); // Centralized state update (Section 55.21 & 55.26)
+    addCoins(earnedCoins);
     setRecentReward({ coins: earnedCoins, score: finalScore, tokens: earnedTokens });
     setScreenMode("home");
     // Clear recent reward banner after 6s
@@ -78,23 +84,35 @@ export default function GameHome() {
 
   // IF USER IS IN ACTIVE GAMEPLAY: RENDER FULL GAMEPLAY SCREEN
   if (screenMode === "playing") {
-    if (game.id === 1) {
-      return (
-        <BladeMasterGame
-          game={game}
-          onFinishGame={handleFinishGame}
-          onBack={() => setScreenMode("home")}
-        />
-      );
-    }
-    if (game.id === 5) {
-      return (
-        <SliceStormGame
-          game={game}
-          onFinishGame={handleFinishGame}
-          onBack={() => setScreenMode("home")}
-        />
-      );
+    switch (game.id) {
+      case 1:
+        return <BladeMasterGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 2:
+        return <NutcraftGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 3:
+        return <BowlexaGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 4:
+        return <BlockCrushGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 5:
+        return <SliceStormGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 6:
+        return <CosmoWarriorGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 7:
+        return <ToiletTacticsGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 8:
+        return <WordHuntGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 9:
+        return <BubbleBlastGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 10:
+        return <MergeMasterGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 11:
+        return <WormzyGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 12:
+        return <AquaFillGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      case 13:
+        return <RealmClashGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
+      default:
+        return <BladeMasterGame game={game} onFinishGame={handleFinishGame} onBack={() => setScreenMode("home")} />;
     }
   }
 
@@ -106,87 +124,78 @@ export default function GameHome() {
         "--game-light-bg": game.theme?.lightBg || "#fff"
       }}
     >
-      {/* Light Theme Environment Header (Section 55.6 & 55.10) */}
+      {/* Header */}
       <header className={styles.topBar}>
         <button
           className={styles.backButton}
           onClick={() => navigate("/")}
-          aria-label="Back to all games"
+          aria-label="Back to Games"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
           <span>All Games</span>
         </button>
 
-        {/* Centralized Game Coins Balance Display (Section 55.8) */}
-        <Link to="/redeem" className={styles.coinBalanceBadge} title="Central Game Coins. Click to redeem!">
-          <img src="/assets/game-coin.png" alt="Game Coin" className={styles.coinImg} />
+        {/* Real-time Centralized Coin Balance */}
+        <Link to="/redeem" className={styles.coinBalanceBadge}>
+          <img src="/assets/game-coin.png" alt="Coins" className={styles.coinImg} />
           <div className={styles.coinDetails}>
-            <span className={styles.coinCount}>{gameCoins}</span>
+            <span className={styles.coinCount}>{gameCoins.toLocaleString()}</span>
             <span className={styles.coinWord}>Game Coins</span>
           </div>
         </Link>
       </header>
 
-      {/* Main Game Home Content Card */}
+      {/* Main Content Card Container */}
       <main className={styles.contentContainer}>
-        {/* Celebration Banner if just finished a game */}
+        {/* Recent Reward Floating Notification Banner */}
         {recentReward && (
-          <div className={styles.recentRewardAlert}>
+          <div className={styles.recentRewardAlert} role="status">
             <CheckCircle2 size={20} className={styles.rewardSuccessIcon} />
             <div>
-              <strong>Run Complete!</strong> You scored {recentReward.score} and earned{" "}
+              <strong>Run Complete!</strong> You scored {recentReward.score} pts and received{" "}
               <strong>+{recentReward.coins} Game Coins</strong>
-              {recentReward.tokens > 0 ? (
-                <> and <strong>+{recentReward.tokens} Arcade Tokens</strong></>
-              ) : null}{" "}
-              added to your balance!
+              {recentReward.tokens > 0 && ` and +${recentReward.tokens} Arcade Tokens`}!
             </div>
           </div>
         )}
 
+        {/* Hero Card */}
         <div className={styles.gameCardHero}>
-          {/* Game Illustration & Artwork */}
+          {/* Left Hero Artwork Column */}
           <div className={styles.artworkContainer}>
-            <picture>
-              <source srcSet={game.image} type="image/avif" />
-              <img
-                src={game.image}
-                alt={game.name}
-                className={styles.heroArtwork}
-              />
-            </picture>
+            <img
+              src={game.image}
+              alt={game.name}
+              className={styles.heroArtwork}
+              loading="eager"
+            />
             <div className={styles.artworkOverlay} />
-
             <div className={styles.badgeRow}>
               <span className={styles.categoryBadge}>{game.category}</span>
-              {game.playable ? (
-                <span className={styles.playableBadge}>
-                  <Sparkles size={12} /> Playable Web Game
-                </span>
-              ) : (
-                <span className={styles.showcaseBadge}>Showcase Banner</span>
-              )}
+              <span className={styles.playableBadge}>
+                <Sparkles size={12} /> Playable Web Game
+              </span>
             </div>
           </div>
 
-          {/* Game Info & Description */}
+          {/* Right Details Column */}
           <div className={styles.gameDetails}>
             <h1 className={styles.title}>{game.name}</h1>
             <p className={styles.subtitle}>{game.subtitle}</p>
             <p className={styles.description}>{game.description}</p>
 
-            {/* Entry Fee Box (Section 55.11 & 55.12) */}
+            {/* Entry Cost Pill Box */}
             <div className={styles.entryBox}>
               <div className={styles.entryInfo}>
-                <span className={styles.entryLabel}>ENTRY FEE</span>
+                <span className={styles.entryLabel}>ENTRY PER PLAY</span>
                 <div className={styles.entryCost}>
                   <img src="/assets/token.png" alt="Token" className={styles.tokenIcon} />
-                  <span>{game.cost} Tokens</span>
+                  <span>{game.cost} Arcade Tokens</span>
                 </div>
               </div>
 
               <div className={styles.userBalanceHint}>
-                <span>Your Balance:</span>
+                <span>Your Tokens:</span>
                 <strong className={tokens >= game.cost ? styles.sufficient : styles.insufficient}>
                   {tokens} Tokens
                 </strong>
@@ -198,7 +207,6 @@ export default function GameHome() {
               <button
                 className={styles.playNowBtn}
                 onClick={handlePlayNowClick}
-                disabled={!game.playable}
               >
                 <div className={styles.playBtnInner}>
                   <Play size={20} fill="#ffffff" />
@@ -218,28 +226,18 @@ export default function GameHome() {
               )}
             </div>
 
-            {/* Non-playable notification banner */}
-            {!game.playable && (
-              <div className={styles.bannerNotice}>
-                <ShieldAlert size={16} />
-                <span>
-                  This is one of the 11 banner showcase cards. Check out <strong>Blade Master!</strong> or <strong>Slice Storm!</strong> for the two fully developed web games!
-                </span>
-              </div>
-            )}
-
-            {/* Reward Potential Breakdown (Section 55.10 & 55.20) */}
+            {/* Reward Potential Breakdown */}
             {game.rewards && (
               <div className={styles.rewardsTable}>
                 <div className={styles.tableHeader}>
                   <Trophy size={16} className={styles.trophyIcon} />
-                  <span>Game Coin Payout Structure</span>
+                  <span>Reward Potential</span>
                 </div>
                 <div className={styles.tableGrid}>
-                  {game.rewards.map((r, i) => (
-                    <div key={i} className={styles.tableRow}>
-                      <span className={styles.scoreTarget}>{r.score}</span>
-                      <span className={styles.rewardAmt}>+{r.coins} Game Coins</span>
+                  {game.rewards.map((rew, index) => (
+                    <div key={index} className={styles.tableRow}>
+                      <span className={styles.scoreTarget}>{rew.score}</span>
+                      <span className={styles.rewardAmt}>+{rew.coins} Coins</span>
                     </div>
                   ))}
                 </div>
@@ -249,21 +247,25 @@ export default function GameHome() {
         </div>
       </main>
 
-      {/* Guide Modal */}
-      <GameGuideModal
-        game={game}
-        isOpen={screenMode === "guide"}
-        onConfirm={handleGuideConfirm}
-      />
-
       {/* Insufficient Token Modal */}
       <TokenModal
         isOpen={showTokenError}
         onClose={() => setShowTokenError(false)}
         requiredTokens={game.cost}
+        currentTokens={tokens}
       />
 
-      {/* Bottom Navigation (Section 55.27) */}
+      {/* First-time / Manual How to Play Guide Modal */}
+      {game.guide && (
+        <GameGuideModal
+          isOpen={screenMode === "guide"}
+          onClose={() => setScreenMode("home")}
+          onConfirm={handleGuideConfirm}
+          game={game}
+        />
+      )}
+
+      {/* Bottom Navigation */}
       <BottomNav activeGameId={game.id} />
     </div>
   );

@@ -56,12 +56,38 @@ export const games = [
     currency: "Tokens",
     tag: "LOGIC",
     category: "Puzzle & Brain",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#84cc16",
       lightBg: "linear-gradient(135deg, #ecfccb 0%, #f7fee7 100%)",
       tagColor: "#65a30d"
-    }
+    },
+    guide: {
+      title: "How to Play Nutcraft",
+      steps: [
+        {
+          title: "Select a Bolt",
+          desc: "Tap or click on any threaded bolt on the board to unscrew and select it."
+        },
+        {
+          title: "Find a Vacant Hole",
+          desc: "Tap an empty hole to screw the bolt into its new slot."
+        },
+        {
+          title: "Drop Wooden Plates",
+          desc: "When all bolts securing a wooden plate are removed, gravity makes it drop!"
+        },
+        {
+          title: "Clear All Plates",
+          desc: "Drop all wooden plates to complete the level and win bonus tokens!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "300+ pts", coins: 25 },
+      { score: "150+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 3,
@@ -74,12 +100,38 @@ export const games = [
     currency: "Tokens",
     tag: "ARCADE",
     category: "Physics & Arcade",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#f97316",
       lightBg: "linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%)",
       tagColor: "#ea580c"
-    }
+    },
+    guide: {
+      title: "How to Play Bowlexa",
+      steps: [
+        {
+          title: "Watch the Pendulum",
+          desc: "The bowling pendulum swings back and forth across the lane."
+        },
+        {
+          title: "Time Your Release",
+          desc: "Tap the screen at the right angle to launch the bowling ball straight down the alley."
+        },
+        {
+          title: "Hit Strikes",
+          desc: "Knock down all 10 pins in a single throw to earn an instant STRIKE bonus!"
+        },
+        {
+          title: "Earn Tokens",
+          desc: "Score high before running out of balls to earn Coins and Arcade Tokens."
+        }
+      ]
+    },
+    rewards: [
+      { score: "350+ pts", coins: 30 },
+      { score: "200+ pts", coins: 18 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 4,
@@ -92,12 +144,38 @@ export const games = [
     currency: "Tokens",
     tag: "CHALLENGE",
     category: "Casual & Arcade",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#06b6d4",
       lightBg: "linear-gradient(135deg, #cffafe 0%, #ecfeff 100%)",
       tagColor: "#0891b2"
-    }
+    },
+    guide: {
+      title: "How to Play Block Crush",
+      steps: [
+        {
+          title: "Control the Paddle",
+          desc: "Drag with your finger or move your mouse horizontally to slide the laser paddle."
+        },
+        {
+          title: "Bounce the Ball",
+          desc: "Hit the ball with different sections of your paddle to direct its rebound angle."
+        },
+        {
+          title: "Smash Bricks",
+          desc: "Break all neon bricks to clear the stage and unlock the next challenge."
+        },
+        {
+          title: "Save Your Lives",
+          desc: "Don't let the ball fall past your paddle! You have 3 lives per run."
+        }
+      ]
+    },
+    rewards: [
+      { score: "400+ pts", coins: 30 },
+      { score: "250+ pts", coins: 20 },
+      { score: "Base Run", coins: 10 }
+    ]
   },
   {
     id: 5,
@@ -130,7 +208,7 @@ export const games = [
         },
         {
           title: "Dodge Bombs",
-          desc: "Careful! Never slice the ticking black bombs. Hitting a bomb costs a life."
+          desc: "Careful! Never slice the ticking black bombs. Hitting a bomb causes instant Game Over."
         },
         {
           title: "Earn Game Coins",
@@ -156,12 +234,38 @@ export const games = [
     currency: "Tokens",
     tag: "RETRO",
     category: "Space Shooter",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#6366f1",
       lightBg: "linear-gradient(135deg, #e0e7ff 0%, #eef2ff 100%)",
       tagColor: "#4f46e5"
-    }
+    },
+    guide: {
+      title: "How to Play Cosmo Warrior",
+      steps: [
+        {
+          title: "Pilot Your Ship",
+          desc: "Drag your finger or mouse across the screen to steer your starfighter in any direction."
+        },
+        {
+          title: "Auto Lasers",
+          desc: "Your cannons automatically blast rapid-fire blue laser bolts upward."
+        },
+        {
+          title: "Destroy Alien Swarms",
+          desc: "Shoot down alien raiders before they collide into your hull."
+        },
+        {
+          title: "Survive Waves",
+          desc: "Clear waves to earn bonus tokens and huge coin multipliers!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "600+ pts", coins: 30 },
+      { score: "300+ pts", coins: 20 },
+      { score: "Base Run", coins: 10 }
+    ]
   },
   {
     id: 7,
@@ -174,12 +278,38 @@ export const games = [
     currency: "Tokens",
     tag: "TRENDING",
     category: "Tower Defense",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#eab308",
       lightBg: "linear-gradient(135deg, #fef9c3 0%, #fefce8 100%)",
       tagColor: "#ca8a04"
-    }
+    },
+    guide: {
+      title: "How to Play Toilet Tactics",
+      steps: [
+        {
+          title: "Tap to Zap",
+          desc: "Tap or click on advancing toilet invaders to fire instant plasma zaps."
+        },
+        {
+          title: "Protect the Baseline",
+          desc: "Never let invaders cross the yellow city defense line at the bottom!"
+        },
+        {
+          title: "Health Monitor",
+          desc: "Keep your base health above 0% to survive the invasion."
+        },
+        {
+          title: "Wave Bonuses",
+          desc: "Survive waves to claim Arcade Tokens and victory coins."
+        }
+      ]
+    },
+    rewards: [
+      { score: "450+ pts", coins: 25 },
+      { score: "250+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 8,
@@ -192,12 +322,38 @@ export const games = [
     currency: "Tokens",
     tag: "BRAIN",
     category: "Word & Trivia",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#3b82f6",
       lightBg: "linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)",
       tagColor: "#2563eb"
-    }
+    },
+    guide: {
+      title: "How to Play Word Hunt",
+      steps: [
+        {
+          title: "Tap Letter Tiles",
+          desc: "Tap letters in the 4x4 grid to construct arcade vocabulary words."
+        },
+        {
+          title: "Arcade Target Words",
+          desc: "Find words like COIN, GAME, WIN, VELOOP, STORM, BLADE, and more!"
+        },
+        {
+          title: "Submit Words",
+          desc: "Tap 'SUBMIT WORD' to score points and bank words before the 40s timer ends."
+        },
+        {
+          title: "Token Rewards",
+          desc: "Every 3 unique words found awards +5 bonus Arcade Tokens!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "350+ pts", coins: 25 },
+      { score: "180+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 9,
@@ -210,12 +366,38 @@ export const games = [
     currency: "Tokens",
     tag: "CLASSIC",
     category: "Match-3 Puzzle",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#ec4899",
       lightBg: "linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%)",
       tagColor: "#db2777"
-    }
+    },
+    guide: {
+      title: "How to Play Bubble Blast Legend",
+      steps: [
+        {
+          title: "Aim the Cannon",
+          desc: "Move your finger or mouse across the screen to aim the cannon guide arrow."
+        },
+        {
+          title: "Launch Bubbles",
+          desc: "Tap or click to shoot the loaded marble bubble up towards the ceiling."
+        },
+        {
+          title: "Match 3 or More",
+          desc: "Connect 3 or more bubbles of the identical color to pop the cluster!"
+        },
+        {
+          title: "Clear the Board",
+          desc: "Pop all bubbles before they descend into the danger zone."
+        }
+      ]
+    },
+    rewards: [
+      { score: "400+ pts", coins: 25 },
+      { score: "200+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 10,
@@ -228,12 +410,38 @@ export const games = [
     currency: "Tokens",
     tag: "STRATEGY",
     category: "Merge Puzzle",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#a855f7",
       lightBg: "linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%)",
       tagColor: "#9333ea"
-    }
+    },
+    guide: {
+      title: "How to Play Merge Master",
+      steps: [
+        {
+          title: "Slide Tiles",
+          desc: "Swipe in any direction or use the on-screen D-pad / Arrow keys to slide tiles."
+        },
+        {
+          title: "Merge Same Numbers",
+          desc: "When two tiles with the same number touch, they combine into double value!"
+        },
+        {
+          title: "Aim for 2048",
+          desc: "Keep combining 128 -> 256 -> 512 -> 1024 to create the legendary 2048 tile."
+        },
+        {
+          title: "Keep Board Clear",
+          desc: "Avoid filling the grid without moves to keep the run alive."
+        }
+      ]
+    },
+    rewards: [
+      { score: "600+ pts", coins: 30 },
+      { score: "300+ pts", coins: 18 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 11,
@@ -246,12 +454,38 @@ export const games = [
     currency: "Tokens",
     tag: "CASUAL",
     category: "Platformer",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#22c55e",
       lightBg: "linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%)",
       tagColor: "#16a34a"
-    }
+    },
+    guide: {
+      title: "How to Play Wormzy",
+      steps: [
+        {
+          title: "Steer Wormzy",
+          desc: "Use the on-screen D-pad buttons, arrow keys, or WASD to change direction."
+        },
+        {
+          title: "Munch Apples",
+          desc: "Guide Wormzy to eat red apples to increase length and rack up score."
+        },
+        {
+          title: "Avoid Collisions",
+          desc: "Never crash into the boundary walls or your own tail!"
+        },
+        {
+          title: "Token Milestones",
+          desc: "Every 5 apples consumed awards +5 bonus Arcade Tokens!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "400+ pts", coins: 25 },
+      { score: "200+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 12,
@@ -264,12 +498,38 @@ export const games = [
     currency: "Tokens",
     tag: "PHYSICS",
     category: "Creative Puzzle",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#0284c7",
       lightBg: "linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%)",
       tagColor: "#0369a1"
-    }
+    },
+    guide: {
+      title: "How to Play Aqua Fill",
+      steps: [
+        {
+          title: "Draw Lines",
+          desc: "Drag your finger or mouse across the screen to sketch physics pencil lines."
+        },
+        {
+          title: "Guide Water",
+          desc: "Falling water droplets bounce off your drawn lines and obstacles."
+        },
+        {
+          title: "Fill the Smiling Cup",
+          desc: "Direct droplets into the glass cup until the water level reaches 100%."
+        },
+        {
+          title: "Level Clear",
+          desc: "Filling the cup clears the level and awards +5 Arcade Tokens!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "350+ pts", coins: 25 },
+      { score: "180+ pts", coins: 15 },
+      { score: "Base Run", coins: 8 }
+    ]
   },
   {
     id: 13,
@@ -282,12 +542,38 @@ export const games = [
     currency: "Tokens",
     tag: "TACTICS",
     category: "Real-Time Strategy",
-    playable: false,
+    playable: true,
     theme: {
       accentColor: "#ef4444",
       lightBg: "linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%)",
       tagColor: "#dc2626"
-    }
+    },
+    guide: {
+      title: "How to Play Realm Clash",
+      steps: [
+        {
+          title: "Gather Elixir",
+          desc: "Your purple elixir gauge charges automatically up to a maximum of 10."
+        },
+        {
+          title: "Deploy Troops",
+          desc: "Tap Archer (2 Elixir), Knight (3 Elixir), or Wizard (4 Elixir) cards to deploy."
+        },
+        {
+          title: "Battle in Lanes",
+          desc: "Your troops clash against incoming enemies and march towards the enemy tower."
+        },
+        {
+          title: "Destroy Bastion",
+          desc: "Destroy the enemy King Bastion before yours falls to win +15 Tokens!"
+        }
+      ]
+    },
+    rewards: [
+      { score: "400+ pts", coins: 30 },
+      { score: "200+ pts", coins: 20 },
+      { score: "Base Run", coins: 10 }
+    ]
   }
 ];
 

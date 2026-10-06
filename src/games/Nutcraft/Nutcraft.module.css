@@ -1,0 +1,240 @@
+.gameContainer {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(180deg, #ecfccb 0%, #f7fee7 50%, #fef9c3 100%);
+  color: #365314;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
+
+.hud {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .hud {
+    padding: 10px 14px;
+  }
+}
+
+.backBtn {
+  background: #ffffff;
+  border: 1px solid #d9f99d;
+  color: #365314;
+  padding: 8px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: #f7fee7;
+  transform: translateX(-2px);
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statPill {
+  background: #ffffff;
+  border: 1px solid #d9f99d;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #65a30d;
+}
+
+.statValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: #365314;
+}
+
+.statPillHighlight {
+  background: #84cc16;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(132, 204, 22, 0.35);
+}
+
+.statPillHighlight .statValue {
+  color: #ffffff;
+}
+
+.soundBtn {
+  background: #ffffff;
+  border: 1px solid #d9f99d;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #65a30d;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.gameArea {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  padding: 10px 16px;
+  box-sizing: border-box;
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  height: 480px;
+  background: radial-gradient(circle, #fef08a 0%, #fde047 100%);
+  border: 4px solid #ca8a04;
+  border-radius: 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12), inset 0 2px 8px rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+.instructionsPrompt {
+  font-size: 12px;
+  font-weight: 800;
+  color: #4d7c0f;
+  margin-top: 12px;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.plate {
+  position: absolute;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plateFalling {
+  transform: translateY(600px) rotate(45deg) !important;
+  opacity: 0;
+}
+
+.hole {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #713f12;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.holeVacant {
+  border: 2px dashed #a16207;
+  animation: pulseVacant 1.5s infinite;
+}
+
+@keyframes pulseVacant {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.12); }
+}
+
+.bolt {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bolt:hover {
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+.boltSelected {
+  transform: translate(-50%, -50%) scale(1.22) rotate(180deg) !important;
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.8);
+}
+
+.boltInner {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.mistakeBanner {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(220, 38, 38, 0.95);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
+  z-index: 50;
+  pointer-events: none;
+}

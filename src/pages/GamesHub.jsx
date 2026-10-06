@@ -70,8 +70,8 @@ export default function GamesHub() {
                 <Flame size={20} className={styles.statIconGreen} />
               </div>
               <div className={styles.statMeta}>
-                <span className={styles.statNum}>2 Playable</span>
-                <span className={styles.statDesc}>Blade Master & Slice Storm</span>
+                <span className={styles.statNum}>13 Playable</span>
+                <span className={styles.statDesc}>All Arcade Games Ready to Play!</span>
               </div>
             </div>
           </div>
@@ -175,11 +175,11 @@ export default function GamesHub() {
       <section className={styles.spotlightSection}>
         <div className={styles.spotlightCard}>
           <div className={styles.spotlightBadge}>
-            <Trophy size={14} /> MANDATORY ADVANCED GAMES
+            <Trophy size={14} /> FULL ARCADE SUITE
           </div>
-          <h3 className={styles.spotlightTitle}>Two Fully Playable Web Games Ready to Play!</h3>
+          <h3 className={styles.spotlightTitle}>All 13 Arcade Web Games Ready to Play!</h3>
           <p className={styles.spotlightDesc}>
-            Dive straight into <strong>Blade Master!</strong> (precision knife throwing) or <strong>Slice Storm!</strong> (fruit slicing slash trails & combos). Both are integrated with 20 Token deduction, Game Guides, score multipliers, working Revives, and centralized Game Coin rewards!
+            Every game in the arcade is fully playable with 20 Tokens per run! Enjoy <strong>Blade Master!</strong>, <strong>Slice Storm!</strong>, <strong>Nutcraft</strong>, <strong>Bowlexa</strong>, <strong>Block Crush</strong>, <strong>Cosmo Warrior</strong>, <strong>Toilet Tactics</strong>, <strong>Word Hunt</strong>, <strong>Bubble Blast</strong>, <strong>Merge Master</strong>, <strong>Wormzy</strong>, <strong>Aqua Fill</strong>, and <strong>Realm Clash</strong>. Complete stages to win bonus Arcade Tokens and earn Game Coins!
           </p>
         </div>
       </section>
