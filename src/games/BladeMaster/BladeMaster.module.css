@@ -1,0 +1,185 @@
+.gameContainer {
+  min-height: 100vh;
+  /* Mandatory Light Theme Environment (Section 55.6) */
+  background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 50%, #fef9c3 100%);
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  touch-action: manipulation;
+  overflow: hidden;
+  position: relative;
+}
+
+.hud {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.backBtn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  transform: translateX(-2px);
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statPill {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.statValue {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.statPillHighlight {
+  background: #f59e0b;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+.statPillHighlight .statValue {
+  color: #ffffff;
+}
+
+.livesPill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.heartActive {
+  color: #ef4444;
+}
+
+.heartLost {
+  color: #cbd5e1;
+}
+
+.soundBtn {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.soundBtn:hover {
+  color: #0f172a;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.gameCanvas {
+  background: radial-gradient(circle at center 160px, rgba(254, 240, 138, 0.5) 0%, rgba(254, 249, 195, 0.1) 70%);
+  border-radius: 24px;
+  cursor: pointer;
+}
+
+.knifeStock {
+  position: absolute;
+  left: 20px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.knifeIconIndicator {
+  width: 8px;
+  height: 22px;
+  background: linear-gradient(180deg, #94a3b8 0%, #cbd5e1 50%, #78350f 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.tapPrompt {
+  position: absolute;
+  bottom: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #92400e;
+  animation: pulsePrompt 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulsePrompt {
+  0%, 100% { opacity: 0.6; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@media (max-width: 480px) {
+  .gameCanvas {
+    width: 340px;
+    height: 460px;
+  }
+}
