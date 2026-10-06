@@ -5,5 +5,9 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/',
   plugins: [react()],
+  server: {
+    port: 5173,
+    open: true, // Automatically opens default browser on launch
+    host: true, // Exposes on local IP for testing on phone via Wi-Fi
+  },
 })
-

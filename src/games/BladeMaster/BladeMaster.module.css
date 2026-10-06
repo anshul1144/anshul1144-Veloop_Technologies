@@ -1,5 +1,6 @@
 .gameContainer {
   min-height: 100vh;
+  min-height: 100dvh;
   /* Mandatory Light Theme Environment (Section 55.6) */
   background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 50%, #fef9c3 100%);
   color: #1e293b;
@@ -7,9 +8,13 @@
   flex-direction: column;
   align-items: center;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: manipulation;
+  overscroll-behavior: none;
   overflow: hidden;
   position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
 }
 
 .hud {
@@ -20,6 +25,20 @@
   align-items: center;
   justify-content: space-between;
   z-index: 10;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .hud {
+    padding: 10px 14px;
+  }
+  .statPill, .statPillHighlight {
+    padding: 5px 10px;
+    gap: 4px;
+  }
+  .statValue {
+    font-size: 13px;
+  }
 }
 
 .backBtn {
@@ -36,6 +55,8 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .backBtn:hover {
@@ -120,6 +141,8 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .soundBtn:hover {
@@ -135,19 +158,28 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .gameCanvas {
   background: radial-gradient(circle at center 160px, rgba(254, 240, 138, 0.5) 0%, rgba(254, 249, 195, 0.1) 70%);
   border-radius: 24px;
   cursor: pointer;
+  max-width: min(92vw, 380px);
+  width: 100%;
+  height: auto;
+  aspect-ratio: 380 / 520;
+  max-height: calc(100dvh - 140px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .knifeStock {
   position: absolute;
   left: 20px;
-  bottom: 80px;
+  bottom: 70px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -155,7 +187,7 @@
 
 .knifeIconIndicator {
   width: 8px;
-  height: 22px;
+  height: 20px;
   background: linear-gradient(180deg, #94a3b8 0%, #cbd5e1 50%, #78350f 100%);
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
@@ -163,25 +195,20 @@
 
 .tapPrompt {
   position: absolute;
-  bottom: 12px;
+  bottom: 8px;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.1em;
   color: #92400e;
   animation: pulsePrompt 2s infinite;
   pointer-events: none;
+  text-align: center;
+  width: 90%;
 }
 
 @keyframes pulsePrompt {
   0%, 100% { opacity: 0.6; transform: translateY(0); }
   50% { opacity: 1; transform: translateY(-3px); }
-}
-
-@media (max-width: 480px) {
-  .gameCanvas {
-    width: 340px;
-    height: 460px;
-  }
 }
 
 .shake {

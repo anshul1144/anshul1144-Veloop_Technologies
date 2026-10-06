@@ -444,3 +444,25 @@
     display: none; /* Auto-defaults to carousel on mobile */
   }
 }
+
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 28px 14px 20px;
+  }
+  .heroTitle {
+    font-size: 26px;
+  }
+  .statsBar {
+    gap: 10px;
+  }
+  .statBox {
+    padding: 10px 14px;
+    flex: 1 1 100%;
+  }
+  .spotlightSection {
+    padding: 0 14px;
+  }
+  .spotlightCard {
+    padding: 18px 16px;
+  }
+}

@@ -6,7 +6,8 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 12px 0;
+  padding-top: max(10px, env(safe-area-inset-top, 10px));
+  padding-bottom: 10px;
 }
 
 .container {
@@ -278,12 +279,18 @@
   cursor: pointer;
   transition: all 0.2s ease;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .dailyRewardBtn:hover {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
   border-color: rgba(245, 158, 11, 0.6);
   transform: translateY(-1px);
+}
+
+.dailyRewardBtn:active {
+  transform: translateY(0);
 }
 
 .dailyGiftIcon {
@@ -308,10 +315,56 @@
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .logoIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+  .brandName {
+    font-size: 15px;
+  }
+  .brandSub {
+    display: none;
+  }
+  .currencies {
+    gap: 6px;
+  }
+  .coinPill, .tokenPill {
+    padding: 5px 10px;
+    gap: 6px;
+  }
+  .coinIcon, .tokenIcon {
+    width: 20px;
+    height: 20px;
+  }
+  .coinVal, .tokenVal {
+    font-size: 13px;
+  }
   .dailyGiftText {
     display: none;
   }
   .dailyRewardBtn {
-    padding: 6px 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding: 0 8px;
+    gap: 6px;
+  }
+  .coinPill, .tokenPill {
+    padding: 4px 7px;
+  }
+  .coinVal, .tokenVal {
+    font-size: 12px;
   }
 }

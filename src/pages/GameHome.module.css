@@ -123,9 +123,17 @@
 .artworkContainer {
   position: relative;
   flex: 1 1 45%;
-  min-height: 340px;
+  min-height: 220px;
+  max-height: 360px;
   background: #0f172a;
   overflow: hidden;
+}
+
+@media (max-width: 859px) {
+  .artworkContainer {
+    min-height: 180px;
+    max-height: 220px;
+  }
 }
 
 .heroArtwork {
@@ -411,8 +419,11 @@
 }
 
 @media (max-width: 640px) {
+  .gameDetails {
+    padding: 20px 16px;
+  }
   .title {
-    font-size: 26px;
+    font-size: 24px;
   }
   .actions {
     flex-direction: column;
@@ -423,5 +434,17 @@
   }
   .tableGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .topBar {
+    padding: 12px 14px;
+  }
+  .contentContainer {
+    padding: 0 12px;
+  }
+  .gameCardHero {
+    border-radius: 18px;
   }
 }

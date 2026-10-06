@@ -1,5 +1,6 @@
 .gameContainer {
   min-height: 100vh;
+  min-height: 100dvh;
   /* Mandatory Light Theme Environment (Section 55.6) */
   background: linear-gradient(180deg, #d1fae5 0%, #ecfdf5 50%, #f0fdf4 100%);
   color: #064e3b;
@@ -7,9 +8,13 @@
   flex-direction: column;
   align-items: center;
   user-select: none;
+  -webkit-user-select: none;
   touch-action: none; /* crucial for swipe gestures */
+  overscroll-behavior: none;
   overflow: hidden;
   position: relative;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
 }
 
 .hud {
@@ -20,6 +25,20 @@
   align-items: center;
   justify-content: space-between;
   z-index: 10;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .hud {
+    padding: 10px 14px;
+  }
+  .statPill, .statPillHighlight {
+    padding: 5px 10px;
+    gap: 4px;
+  }
+  .statValue {
+    font-size: 13px;
+  }
 }
 
 .backBtn {
@@ -36,6 +55,8 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .backBtn:hover {
@@ -118,6 +139,8 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .soundBtn:hover {
@@ -133,13 +156,22 @@
   align-items: center;
   justify-content: center;
   flex: 1;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .gameCanvas {
   background: radial-gradient(circle at center, rgba(209, 250, 229, 0.6) 0%, rgba(236, 253, 245, 0.2) 70%);
   border-radius: 24px;
   cursor: crosshair;
+  max-width: min(92vw, 400px);
+  width: 100%;
+  height: auto;
+  aspect-ratio: 400 / 520;
+  max-height: calc(100dvh - 140px);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .comboBanner {
@@ -163,7 +195,7 @@
 
 .swipePrompt {
   position: absolute;
-  bottom: 12px;
+  bottom: 8px;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -171,6 +203,7 @@
   animation: pulsePrompt 2s infinite;
   pointer-events: none;
   text-align: center;
+  width: 90%;
 }
 
 @keyframes popBounce {
@@ -182,13 +215,6 @@
 @keyframes pulsePrompt {
   0%, 100% { opacity: 0.6; transform: translateY(0); }
   50% { opacity: 1; transform: translateY(-3px); }
-}
-
-@media (max-width: 480px) {
-  .gameCanvas {
-    width: 340px;
-    height: 480px;
-  }
 }
 
 .shake {

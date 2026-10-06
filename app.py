@@ -1,6 +1,14 @@
-# Entrypoint wrapper redirecting to streamlit_app.py
-import runpy
+import subprocess
+import sys
 from pathlib import Path
 
-target = Path(__file__).resolve().parent / "streamlit_app.py"
-runpy.run_path(str(target), run_name="__main__")
+
+def main() -> int:
+    target = Path(__file__).resolve().parent / "streamlit_app.py"
+    return subprocess.call(
+        [sys.executable, "-m", "streamlit", "run", str(target), *sys.argv[1:]]
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
