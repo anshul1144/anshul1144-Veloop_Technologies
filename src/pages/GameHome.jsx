@@ -68,12 +68,12 @@ export default function GameHome() {
   };
 
   // Called when player finishes run and clicks "No Thanks" (Section 55.25)
-  const handleFinishGame = (earnedCoins, finalScore) => {
+  const handleFinishGame = (earnedCoins, finalScore, earnedTokens = 0) => {
     addCoins(earnedCoins); // Centralized state update (Section 55.21 & 55.26)
-    setRecentReward({ coins: earnedCoins, score: finalScore });
+    setRecentReward({ coins: earnedCoins, score: finalScore, tokens: earnedTokens });
     setScreenMode("home");
-    // Clear recent reward banner after 5s
-    setTimeout(() => setRecentReward(null), 5000);
+    // Clear recent reward banner after 6s
+    setTimeout(() => setRecentReward(null), 6000);
   };
 
   // IF USER IS IN ACTIVE GAMEPLAY: RENDER FULL GAMEPLAY SCREEN
@@ -135,7 +135,11 @@ export default function GameHome() {
             <CheckCircle2 size={20} className={styles.rewardSuccessIcon} />
             <div>
               <strong>Run Complete!</strong> You scored {recentReward.score} and earned{" "}
-              <strong>+{recentReward.coins} Game Coins</strong> added to your central balance!
+              <strong>+{recentReward.coins} Game Coins</strong>
+              {recentReward.tokens > 0 ? (
+                <> and <strong>+{recentReward.tokens} Arcade Tokens</strong></>
+              ) : null}{" "}
+              added to your balance!
             </div>
           </div>
         )}

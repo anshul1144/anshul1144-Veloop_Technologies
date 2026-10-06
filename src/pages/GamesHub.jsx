@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Sparkles, Gamepad2, ShieldCheck, Flame, Trophy, Coins, Compass } from "lucide-react";
+import { Sparkles, Gamepad2, ShieldCheck, Flame, Trophy, Coins, Compass, Gift } from "lucide-react";
 import GamesCarousel from "../components/games/GamesCarousel";
 import GameCard from "../components/games/GameCard";
 import BottomNav from "../components/layout/BottomNav";
+import DailyRewardModal from "../components/shared/DailyRewardModal";
 import { games } from "../data/gamesData";
 import { useGameCoins } from "../context/GameCoinContext";
 import styles from "./GamesHub.module.css";
@@ -10,9 +11,10 @@ import styles from "./GamesHub.module.css";
 const CATEGORIES = ["All Games", "Action & Reflex", "Puzzle & Brain", "Arcade", "Strategy"];
 
 export default function GamesHub() {
-  const { gameCoins, tokens } = useGameCoins();
+  const { gameCoins, tokens, isDailyClaimable, loginStreak } = useGameCoins();
   const [activeCategory, setActiveCategory] = useState("All Games");
   const [viewMode, setViewMode] = useState("carousel"); // 'carousel' or 'grid'
+  const [showDailyModal, setShowDailyModal] = useState(false);
 
   const filteredGames = games.filter((g) => {
     if (activeCategory === "All Games") return true;
@@ -73,6 +75,34 @@ export default function GamesHub() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Daily Login Rewards Callout Banner */}
+      <section className={styles.dailyRewardSection}>
+        <div className={styles.dailyRewardCard}>
+          <div className={styles.dailyRewardLeft}>
+            <div className={styles.dailyGiftIconWrapper}>
+              <Gift size={28} className={styles.dailyGiftIcon} />
+            </div>
+            <div className={styles.dailyRewardText}>
+              <div className={styles.dailyRewardHeading}>
+                <strong>Daily Login Rewards</strong>
+                {isDailyClaimable && <span className={styles.readyBadge}>CLAIM READY!</span>}
+              </div>
+              <p className={styles.dailyRewardDesc}>
+                Log in daily to claim up to <strong>+100 Arcade Tokens</strong> for free gameplay!
+                {loginStreak > 0 && ` Current Streak: ${loginStreak} Day${loginStreak > 1 ? "s" : ""}.`}
+              </p>
+            </div>
+          </div>
+          <button
+            className={isDailyClaimable ? styles.dailyClaimActiveBtn : styles.dailyClaimDoneBtn}
+            onClick={() => setShowDailyModal(true)}
+          >
+            <Sparkles size={16} />
+            <span>{isDailyClaimable ? "CLAIM DAILY TOKENS" : "VIEW 7-DAY CALENDAR"}</span>
+          </button>
         </div>
       </section>
 
@@ -156,6 +186,12 @@ export default function GamesHub() {
 
       {/* Global Bottom Navigation (Section 55.27) */}
       <BottomNav />
+
+      {/* Daily Login Rewards Modal */}
+      <DailyRewardModal
+        isOpen={showDailyModal}
+        onClose={() => setShowDailyModal(false)}
+      />
     </main>
   );
 }

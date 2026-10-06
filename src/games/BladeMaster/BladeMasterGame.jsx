@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeft, RotateCcw, Volume2, VolumeX, Trophy, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RotateCcw, Volume2, VolumeX, Trophy, AlertTriangle, Sparkles } from "lucide-react";
 import GameOverModal from "../../components/shared/GameOverModal";
+import { useGameCoins } from "../../context/GameCoinContext";
 import styles from "./BladeMaster.module.css";
 
 // Web Audio sound synthesizer for instant zero-latency feedback
@@ -106,16 +107,19 @@ const sfx = new SoundFX();
 
 export default function BladeMasterGame({ game, onFinishGame, onBack }) {
   const canvasRef = useRef(null);
+  const { addTokens } = useGameCoins();
 
   // Game UI state
   const [score, setScore] = useState(0);
   const [stage, setStage] = useState(1);
   const [knivesLeft, setKnivesLeft] = useState(7);
+  const [tokensWon, setTokensWon] = useState(0);
   const [reviveCount, setReviveCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameOverReason, setGameOverReason] = useState("");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [mistakeBanner, setMistakeBanner] = useState(null);
+  const [stageRewardBanner, setStageRewardBanner] = useState(null);
   const [isShaking, setIsShaking] = useState(false);
 
   const soundEnabledRef = useRef(soundEnabled);
@@ -135,7 +139,8 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
     running: true,
     knivesLeft: 7,
     stage: 1,
-    score: 0
+    score: 0,
+    tokensWon: 0
   });
 
   // Calculate earned Game Coins reward based on score
@@ -325,10 +330,18 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
             setKnivesLeft(remaining);
 
             if (remaining <= 0) {
-              // Stage cleared!
+              // Stage cleared! Award +5 Arcade Tokens for completing stage!
               if (soundEnabledRef.current) sfx.playStageClear();
               setScore((s) => s + 50);
               stateRef.current.score += 50;
+
+              // Stage completion token award!
+              addTokens(5);
+              stateRef.current.tokensWon = (stateRef.current.tokensWon || 0) + 5;
+              setTokensWon((t) => t + 5);
+              setStageRewardBanner(`STAGE ${stateRef.current.stage} CLEARED! +5 TOKENS!`);
+              setTimeout(() => setStageRewardBanner(null), 1800);
+
               const nextStage = stateRef.current.stage + 1;
               setTimeout(() => setupStage(nextStage), 400);
             }
@@ -567,11 +580,14 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
   // Play Again: restart completely from stage 1
   const handlePlayAgain = () => {
     setScore(0);
+    setTokensWon(0);
     setReviveCount(0);
     setIsGameOver(false);
     setMistakeBanner(null);
+    setStageRewardBanner(null);
     setupStage(1);
     stateRef.current.score = 0;
+    stateRef.current.tokensWon = 0;
     stateRef.current.running = true;
     stateRef.current.lastTime = performance.now();
   };
@@ -579,7 +595,7 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
   // Cash-in & Return Home
   const handleNoThanks = () => {
     const earned = calculateEarnedCoins(score);
-    onFinishGame(earned, score);
+    onFinishGame(earned, score, tokensWon);
   };
 
   return (
@@ -631,6 +647,14 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
           ))}
         </div>
 
+        {/* Floating Stage Clear Tokens Banner */}
+        {stageRewardBanner && (
+          <div className={styles.stageRewardBanner}>
+            <Sparkles size={18} />
+            <span>{stageRewardBanner}</span>
+          </div>
+        )}
+
         {/* Floating Mistake Banner */}
         {mistakeBanner && (
           <div className={styles.mistakeBanner}>
@@ -645,11 +669,12 @@ export default function BladeMasterGame({ game, onFinishGame, onBack }) {
         </div>
       </div>
 
-      {/* Game Over Modal with Mistake Reason */}
+      {/* Game Over Modal with Mistake Reason & Tokens Earned */}
       <GameOverModal
         isOpen={isGameOver}
         score={score}
         earnedCoins={calculateEarnedCoins(score)}
+        earnedTokens={tokensWon}
         reason={gameOverReason}
         isMistake={true}
         canRevive={reviveCount < 1}

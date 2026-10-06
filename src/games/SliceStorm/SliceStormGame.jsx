@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Timer, Volume2, VolumeX, Sparkles, Trophy, AlertTriangle } from "lucide-react";
 import GameOverModal from "../../components/shared/GameOverModal";
+import { useGameCoins } from "../../context/GameCoinContext";
 import styles from "./SliceStorm.module.css";
 
 // Web Audio sound synthesizer for fruit slicing & combos
@@ -131,10 +132,12 @@ const FRUIT_TYPES = [
 
 export default function SliceStormGame({ game, onFinishGame, onBack }) {
   const canvasRef = useRef(null);
+  const { addTokens } = useGameCoins();
 
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
   const [strikes, setStrikes] = useState(0); // 3 strikes = game over
+  const [tokensWon, setTokensWon] = useState(0);
   const [reviveCount, setReviveCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameOverReason, setGameOverReason] = useState("");
@@ -149,6 +152,9 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
 
   const strikesRef = useRef(0);
   strikesRef.current = strikes;
+
+  const scoreRef = useRef(0);
+  scoreRef.current = score;
 
   // Active game animation refs
   const stateRef = useRef({
@@ -181,7 +187,16 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
         if (t <= 1) {
           stateRef.current.running = false;
           setIsMistakeOver(false);
-          setGameOverReason("Time Expired! The 30-second storm concluded.");
+          setGameOverReason("Storm Conquered! You survived the full 30 seconds and won the game!");
+
+          // WIN RUN TOKENS REWARD! 15 Tokens for surviving storm + milestone score bonus
+          const finalScore = scoreRef.current;
+          const winBonus = 15;
+          const scoreBonus = finalScore >= 350 ? 10 : (finalScore >= 200 ? 5 : 0);
+          const totalWon = winBonus + scoreBonus;
+          addTokens(totalWon);
+          setTokensWon(totalWon);
+
           setIsGameOver(true);
           return 0;
         }
@@ -641,8 +656,14 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+    const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
+    if (clientX === undefined || clientY === undefined) return;
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     stateRef.current.bladePoints = [{ x, y, time: performance.now() }];
     if (soundEnabledRef.current) sliceAudio.playSwoosh();
@@ -653,12 +674,14 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.clientX || e.touches?.[0]?.clientX;
-    const clientY = e.clientY || e.touches?.[0]?.clientY;
+    const clientX = e.clientX !== undefined ? e.clientX : e.touches?.[0]?.clientX;
+    const clientY = e.clientY !== undefined ? e.clientY : e.touches?.[0]?.clientY;
     if (clientX === undefined || clientY === undefined) return;
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     const pts = stateRef.current.bladePoints;
     if (pts.length > 0) {
@@ -695,6 +718,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
     strikesRef.current = 0;
     setReviveCount(0);
     setIsGameOver(false);
+    setTokensWon(0);
     setMistakeBanner(null);
     stateRef.current.fruits = [];
     stateRef.current.halves = [];
@@ -706,7 +730,7 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
   // Cash-in & Return Home
   const handleNoThanks = () => {
     const earned = calculateEarnedCoins(score);
-    onFinishGame(earned, score);
+    onFinishGame(earned, score, tokensWon);
   };
 
   return (
@@ -789,11 +813,12 @@ export default function SliceStormGame({ game, onFinishGame, onBack }) {
         </div>
       </div>
 
-      {/* Game Over Modal with Mistake Reason */}
+      {/* Game Over Modal with Mistake Reason & Tokens Earned */}
       <GameOverModal
         isOpen={isGameOver}
         score={score}
         earnedCoins={calculateEarnedCoins(score)}
+        earnedTokens={tokensWon}
         reason={gameOverReason}
         isMistake={isMistakeOver}
         canRevive={reviveCount < 1}

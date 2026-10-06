@@ -5,25 +5,63 @@ const GameCoinContext = createContext();
 
 const STORAGE_KEY = "veloop_user_state_v1";
 
+export const DAILY_LOGIN_SCHEDULE = [
+  { day: 1, tokens: 20, coins: 0, label: "Day 1" },
+  { day: 2, tokens: 25, coins: 0, label: "Day 2" },
+  { day: 3, tokens: 30, coins: 5, label: "Day 3" },
+  { day: 4, tokens: 35, coins: 0, label: "Day 4" },
+  { day: 5, tokens: 40, coins: 10, label: "Day 5" },
+  { day: 6, tokens: 50, coins: 0, label: "Day 6" },
+  { day: 7, tokens: 100, coins: 25, label: "Day 7 (Jackpot!)" }
+];
+
+export const getTodayDateString = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
+
 export function GameCoinProvider({ children }) {
   // Load state from localStorage or initialize defaults
   const [state, setState] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return {
+          gameCoins: parsed.gameCoins ?? 20,
+          tokens: parsed.tokens ?? 60,
+          ve: parsed.ve ?? 0,
+          sve: parsed.sve ?? 0,
+          gems: parsed.gems ?? 0,
+          spins: parsed.spins ?? 0,
+          seenGuides: parsed.seenGuides ?? {},
+          lastLoginDate: parsed.lastLoginDate ?? null,
+          loginStreak: parsed.loginStreak ?? 0,
+          redemptionHistory: parsed.redemptionHistory ?? [
+            {
+              id: "initial-demo-1",
+              optionId: "gems",
+              title: "50 Coins → 5 Gems",
+              coinsSpent: 50,
+              rewardEarned: "5 Gems",
+              timestamp: new Date(Date.now() - 86400000).toLocaleString()
+            }
+          ]
+        };
       }
     } catch (e) {
       console.error("Failed to read storage", e);
     }
     return {
-      gameCoins: 20, // Initial balance as required in Section 55.8
-      tokens: 60, // Tokens for playing games (costs 20 per play)
+      gameCoins: 20,
+      tokens: 60,
       ve: 0,
       sve: 0,
       gems: 0,
       spins: 0,
       seenGuides: {},
+      lastLoginDate: null,
+      loginStreak: 0,
       redemptionHistory: [
         {
           id: "initial-demo-1",
@@ -63,7 +101,7 @@ export function GameCoinProvider({ children }) {
     return true;
   };
 
-  // Token entry logic
+  // Token entry and reward logic
   const deductTokens = (amount = 20) => {
     if (state.tokens < amount) {
       return false;
@@ -87,6 +125,46 @@ export function GameCoinProvider({ children }) {
       ...prev,
       tokens: amount
     }));
+  };
+
+  // Daily Login Rewards
+  const todayStr = getTodayDateString();
+  const isDailyClaimable = state.lastLoginDate !== todayStr;
+
+  const claimDailyReward = () => {
+    if (!isDailyClaimable) {
+      return { success: false, error: "Already claimed today's reward!" };
+    }
+
+    let nextStreak = 1;
+    if (state.lastLoginDate) {
+      const last = new Date(state.lastLoginDate);
+      const today = new Date(todayStr);
+      const diffDays = Math.round((today - last) / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        nextStreak = ((state.loginStreak || 0) % 7) + 1;
+      } else {
+        nextStreak = 1; // streak reset if skipped a day
+      }
+    } else {
+      nextStreak = 1;
+    }
+
+    const reward = DAILY_LOGIN_SCHEDULE[nextStreak - 1];
+
+    setState((prev) => ({
+      ...prev,
+      tokens: prev.tokens + reward.tokens,
+      gameCoins: prev.gameCoins + (reward.coins || 0),
+      lastLoginDate: todayStr,
+      loginStreak: nextStreak
+    }));
+
+    return {
+      success: true,
+      reward,
+      newStreak: nextStreak
+    };
   };
 
   // First-time guide tracking
@@ -132,7 +210,6 @@ export function GameCoinProvider({ children }) {
         redemptionHistory: [newHistoryItem, ...prev.redemptionHistory]
       };
 
-      // Add to corresponding currency
       if (option.id === "ve") updated.ve = (prev.ve || 0) + option.rewardAmount;
       if (option.id === "sve") updated.sve = (prev.sve || 0) + option.rewardAmount;
       if (option.id === "gems") updated.gems = (prev.gems || 0) + option.rewardAmount;
@@ -154,6 +231,8 @@ export function GameCoinProvider({ children }) {
       gems: 0,
       spins: 0,
       seenGuides: {},
+      lastLoginDate: null,
+      loginStreak: 0,
       redemptionHistory: []
     });
   };
@@ -167,6 +246,11 @@ export function GameCoinProvider({ children }) {
         sve: state.sve,
         gems: state.gems,
         spins: state.spins,
+        loginStreak: state.loginStreak,
+        lastLoginDate: state.lastLoginDate,
+        isDailyClaimable,
+        claimDailyReward,
+        dailySchedule: DAILY_LOGIN_SCHEDULE,
         redemptionHistory: state.redemptionHistory,
         addCoins,
         deductCoins,

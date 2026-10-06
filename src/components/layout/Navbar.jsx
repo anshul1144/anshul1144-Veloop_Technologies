@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Gamepad2, Gift, Sparkles, Plus, RotateCcw } from "lucide-react";
 import { useGameCoins } from "../../context/GameCoinContext";
+import DailyRewardModal from "../shared/DailyRewardModal";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
-  const { gameCoins, tokens, addTokens, setTestTokens } = useGameCoins();
+  const { gameCoins, tokens, addTokens, setTestTokens, isDailyClaimable } = useGameCoins();
   const location = useLocation();
   const [showTokenMenu, setShowTokenMenu] = useState(false);
+  const [showDailyRewards, setShowDailyRewards] = useState(false);
 
   return (
     <header className={styles.header}>
@@ -43,6 +45,17 @@ export default function Navbar() {
 
         {/* Currency Status Hub */}
         <div className={styles.currencies}>
+          {/* Daily Login Rewards Button */}
+          <button
+            className={styles.dailyRewardBtn}
+            onClick={() => setShowDailyRewards(true)}
+            title="Daily Login Rewards Tokens"
+          >
+            <Gift size={16} className={styles.dailyGiftIcon} />
+            <span className={styles.dailyGiftText}>Daily Tokens</span>
+            {isDailyClaimable && <span className={styles.notificationDot} />}
+          </button>
+
           {/* Centralized Game Coins */}
           <Link to="/redeem" className={styles.coinPill} title="Central Game Coins balance. Click to redeem rewards!">
             <img src="/assets/game-coin.png" alt="Game Coin" className={styles.coinIcon} />
@@ -104,6 +117,12 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Daily Login Rewards Modal */}
+      <DailyRewardModal
+        isOpen={showDailyRewards}
+        onClose={() => setShowDailyRewards(false)}
+      />
     </header>
   );
 }

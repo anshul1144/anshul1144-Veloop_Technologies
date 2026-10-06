@@ -262,3 +262,56 @@
     display: none;
   }
 }
+
+.dailyRewardBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.dailyRewardBtn:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.4));
+  border-color: rgba(245, 158, 11, 0.6);
+  transform: translateY(-1px);
+}
+
+.dailyGiftIcon {
+  color: #fbbf24;
+}
+
+.notificationDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  background: #ef4444;
+  border: 2px solid #161827;
+  border-radius: 50%;
+  animation: pulseDot 1.4s infinite alternate;
+}
+
+@keyframes pulseDot {
+  from { transform: scale(0.9); }
+  to { transform: scale(1.3); }
+}
+
+@media (max-width: 480px) {
+  .dailyGiftText {
+    display: none;
+  }
+  .dailyRewardBtn {
+    padding: 6px 8px;
+  }
+}

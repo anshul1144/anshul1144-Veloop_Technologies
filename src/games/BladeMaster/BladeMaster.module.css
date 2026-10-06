@@ -222,3 +222,24 @@
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
+.stageRewardBanner {
+  position: absolute;
+  top: 40px;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+  animation: popInBanner 0.25s ease-out;
+  pointer-events: none;
+  z-index: 50;
+  text-transform: uppercase;
+}
+
+

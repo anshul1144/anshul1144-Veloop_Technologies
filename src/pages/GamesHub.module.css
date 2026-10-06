@@ -122,6 +122,142 @@
   color: var(--text-secondary);
 }
 
+/* Daily Login Rewards Banner */
+.dailyRewardSection {
+  padding: 10px 20px 20px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.dailyRewardCard {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.22) 50%, rgba(168, 85, 247, 0.15) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 20px;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 25px rgba(245, 158, 11, 0.15);
+}
+
+.dailyRewardLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dailyGiftIconWrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.45));
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+.dailyGiftIcon {
+  color: #fbbf24;
+}
+
+.dailyRewardText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.dailyRewardHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  color: #ffffff;
+}
+
+.readyBadge {
+  background: #f59e0b;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  animation: pulseReady 1.2s infinite alternate;
+}
+
+.dailyRewardDesc {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.dailyClaimActiveBtn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 13.5px;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.dailyClaimActiveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.6);
+}
+
+.dailyClaimDoneBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #cbd5e1;
+  padding: 11px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dailyClaimDoneBtn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+@keyframes pulseReady {
+  from { opacity: 0.8; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+@media (max-width: 640px) {
+  .dailyRewardCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dailyClaimActiveBtn, .dailyClaimDoneBtn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 /* Category Filters */
 .filterSection {
   padding: 12px 20px;

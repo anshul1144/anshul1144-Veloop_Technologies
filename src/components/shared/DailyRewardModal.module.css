@@ -1,0 +1,324 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 230;
+  background: rgba(10, 12, 22, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  animation: fadeIn 0.25s ease-out;
+  box-sizing: border-box;
+}
+
+.modal {
+  position: relative;
+  width: min(94vw, 560px);
+  max-height: min(92dvh, 92vh, 720px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #181c30;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: clamp(18px, 4vw, 24px);
+  padding: clamp(20px, 4vw, 32px) clamp(16px, 4vw, 28px);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.modal::-webkit-scrollbar {
+  width: 5px;
+}
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.headerIcon {
+  width: clamp(54px, 12vw, 68px);
+  height: clamp(54px, 12vw, 68px);
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.45));
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+  flex-shrink: 0;
+}
+
+.giftIcon {
+  color: #fbbf24;
+}
+
+.title {
+  font-size: clamp(20px, 4.5vw, 26px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+}
+
+.subtitle {
+  font-size: clamp(12px, 2.6vw, 13.5px);
+  color: #94a3b8;
+  margin: 0 0 14px 0;
+  max-width: 440px;
+  line-height: 1.4;
+}
+
+.streakBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.flameIcon {
+  color: #f59e0b;
+}
+
+.successBanner {
+  width: 100%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  animation: popIn 0.25s ease-out;
+}
+
+/* 7-Day Calendar Grid */
+.calendarGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(6px, 1.8vw, 10px);
+  margin-bottom: 20px;
+}
+
+@media (max-width: 440px) {
+  .calendarGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.dayCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  padding: clamp(8px, 2vw, 12px) 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dayHeader {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rewardIconWrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.tokenImg {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.rewardAmount {
+  font-size: clamp(14px, 3.2vw, 17px);
+  font-weight: 900;
+  color: #fbbf24;
+  line-height: 1.1;
+}
+
+.rewardUnit {
+  font-size: 9.5px;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.bonusCoins {
+  font-size: 10px;
+  color: #38bdf8;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* Day Card States */
+.currentDay {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.16) 0%, rgba(217, 119, 6, 0.28) 100%);
+  border: 2px solid #f59e0b;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+  transform: translateY(-2px);
+}
+
+.currentDay .rewardAmount {
+  color: #ffffff;
+}
+
+.completedDay {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
+  opacity: 0.85;
+}
+
+.jackpotCard {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(245, 158, 11, 0.15));
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.jackpotBadge {
+  background: #a855f7;
+  color: #ffffff;
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
+.claimedCheck {
+  color: #10b981;
+  margin-top: 2px;
+}
+
+.readyIndicator {
+  background: #f59e0b;
+  color: #000000;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  animation: pulseReady 1.2s infinite alternate;
+}
+
+.lockedIndicator {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Action Button */
+.claimBtn {
+  width: 100%;
+  border: none;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  padding: clamp(12px, 3vw, 15px);
+  min-height: 48px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: clamp(13px, 3vw, 15px);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  touch-action: manipulation;
+}
+
+.claimBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 26px rgba(245, 158, 11, 0.6);
+}
+
+.claimBtn:active {
+  transform: translateY(0);
+}
+
+.alreadyClaimedBox {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 13px 18px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@keyframes pulseReady {
+  from { opacity: 0.8; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}

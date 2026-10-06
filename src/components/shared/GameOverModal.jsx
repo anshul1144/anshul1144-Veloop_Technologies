@@ -6,6 +6,7 @@ export default function GameOverModal({
   isOpen,
   score,
   earnedCoins,
+  earnedTokens = 0,
   reason = "Mistake occurred during gameplay!",
   isMistake = true,
   canRevive = true,
@@ -44,7 +45,7 @@ export default function GameOverModal({
           </div>
         )}
 
-        {/* Score & Coins Summary */}
+        {/* Score & Currencies Summary */}
         <div className={styles.scoreBoard}>
           <div className={styles.scoreItem}>
             <span className={styles.scoreLabel}>Final Score</span>
@@ -54,12 +55,25 @@ export default function GameOverModal({
           <div className={styles.divider} />
 
           <div className={styles.scoreItem}>
-            <span className={styles.scoreLabel}>Earned Game Coins</span>
+            <span className={styles.scoreLabel}>Game Coins</span>
             <div className={styles.coinReward}>
               <img src="/assets/game-coin.png" alt="Game Coin" className={styles.coinIcon} />
               <span className={styles.coinValue}>+{earnedCoins}</span>
             </div>
           </div>
+
+          {earnedTokens > 0 && (
+            <>
+              <div className={styles.divider} />
+              <div className={styles.scoreItem}>
+                <span className={styles.scoreLabel}>Tokens Won</span>
+                <div className={styles.coinReward}>
+                  <img src="/assets/token.png" alt="Token" className={styles.coinIcon} />
+                  <span className={styles.tokenWonValue}>+{earnedTokens}</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Revive Section */}
@@ -84,7 +98,7 @@ export default function GameOverModal({
         )}
 
         {/* Action Buttons: Try Again & Return Home */}
-        <div className={styles.actionsGroup}>
+        <div className={`${styles.actionsGroup} ${onPlayAgain ? styles.actionsGroupDual : ""}`}>
           {onPlayAgain && (
             <button className={styles.playAgainBtn} onClick={onPlayAgain}>
               <RotateCcw size={16} />
@@ -94,7 +108,9 @@ export default function GameOverModal({
 
           <button className={styles.noThanksBtn} onClick={onNoThanks}>
             <Sparkles size={16} />
-            <span>Collect +{earnedCoins} Coins & Return Home</span>
+            <span>
+              Collect +{earnedCoins} Coins{earnedTokens > 0 ? ` & +${earnedTokens} Tokens` : ""} & Return Home
+            </span>
           </button>
         </div>
       </div>
